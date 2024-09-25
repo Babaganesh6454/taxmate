@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="taxcss.css">
+</head>
+<body>
+    <div class="container">
+        <h1>INCOME TAX CALCULATOR</h1>
+
+        <form id="incomeTaxForm">
+            <label for="academicYear">Academic Year:</label>
+            <select id="academicYear" name="academicYear" required>
+                <option value="2023-2024">2023-2024</option>
+                <option value="2022-2023">2022-2023</option>
+                <option value="2021-2022">2021-2022</option>
+                <option value="2020-2021">2020-2021</option>
+                <option value="2019-2020">2019-2020</option>
+            </select>
+
+            <label for="taxpayerCategory">Taxpayer Category:</label>
+            <select id="taxpayerCategory" name="taxpayerCategory" required>
+                <option value="Individual">Individual</option>
+                <option value="Hindu Undivided Family">Hindu Undivided Family</option>
+                <option value="Associate of Persons">Associate of Persons</option>
+                <option value="Firm">Firms</option>
+                <option value="Companies">Companies</option>
+            </select>
+
+            <fieldset>
+                <legend>Gender:</legend>
+                    <input type="radio" name="gender" value="male" required>
+                    Male<br><br>
+                    <input type="radio" name="gender" value="female">
+                    Female<br><br>
+                    <input type="radio" name="gender" value="other">
+                    Other
+            </fieldset>
+
+            <fieldset>
+                <legend>Age:</legend>
+                    <input type="radio" name="age" value="less than 60" required>
+                    below 60
+                <br><br>
+                    <input type="radio" name="age" value="between60and80">
+                    Between 60&80
+                <br><br>
+                    <input type="radio" name="age" value="above80">
+                    Above 80
+            </fieldset>
+
+            <label for="residence">Residence Status:</label>
+            <select id="residence" name="residence" required>
+                <option value="resident">Resident</option>
+                <option value="nonresident">Non-Resident</option>
+            </select>
+
+            <label for="area">Area:</label>
+            <select id="area" name="area" required>
+                <option value="metro">Metro</option>
+                <option value="nonmetro">Non-Metro</option>
+            </select>
+
+            <label for="income">Gross Income:</label>
+            <input type="number" id="income" name="income" required>
+
+            <label for="deduction">Deduction:</label>
+            <input type="number" id="deduction" name="deduction" required>
+
+            <input type="submit" value="Calculate">
+        </form>
+
+        <div class="result">
+            <h2>RESULT:</h2>
+            <p>Gross Income: <span id="grossincome"></span></p>
+            <p>Deduction: <span id="deductionAmount"></span></p>
+            <p>Net Income: <span id="netIncome"></span></p>
+            <p>Tax Amount (As per New Regime): <span id="newTax"></span></p>
+            <p>Tax Amount (As per Old Regime): <span id="oldTax"></span></p>
+            <p>Rate of Interest (As per New Regime): <span id="newregimeinterestRate"></span></p>
+            <p>Rate of Interest (As per Old Regime): <span id="oldregimeinterestRate"></span></p>
+        </div>
+    </div>
+<script>
+    // Function to format number into Indian currency format
+function formatIndianCurrency(amount) {
+    return amount.toLocaleString('en-IN');
+}
+
+// Update the event listener function to format numbers
+document.getElementById('incomeTaxForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    // Parse income and deduction
+    const incomeInput = document.getElementById('income').value;
+    const deductionInput = document.getElementById('deduction').value;
+
+    // Validate numeric inputs
+    const income = parseFloat(incomeInput) || 0; // Default to 0 if parsing fails
+    const deduction = parseFloat(deductionInput) || 0; // Default to 0 if parsing fails
+
+    // Calculate net income
+    const netIncomeValue = income - deduction;
+    document.getElementById('netIncome').textContent = '₹' + formatIndianCurrency(netIncomeValue);
+
+    // Example tax calculation function (replace with actual tax calculation logic)
+    function oldregime(income) {
+        if (income <= 250000) {
+            return 0;
+        } else if (income >= 250001 && income <= 300000) {
+            return (income * 5) / 100;
+        } else if (income >= 300001 && income <= 500000) {
+            return (income * 5) / 100;
+        } else if (income >= 500001 && income <= 1000000) {
+            return (income * 20) / 100;
+        } else {
+            return (income * 30) / 100;
+        }
+    }
+
+    function newregime(income) {
+        if (income <= 300000) {
+            return 0;
+        } else if (income >= 300001 && income <= 600000) {
+            return (income * 5) / 100;
+        } else if (income >= 600001 && income <= 900000) {
+            return (income * 10) / 100;
+        } else if (income >= 900001 && income <= 1200000) {
+            return (income * 15) / 100;
+        } else if (income >= 1200001 && income <= 1500000) {
+            return (income * 20) / 100;
+        } else {
+            return (income * 30) / 100;
+        }
+    }
+
+    // Calculate tax values
+    const oldTaxValue = oldregime(netIncomeValue);
+    const newTaxValue = newregime(netIncomeValue);
+
+    // Update the UI with the calculated values, formatting them as Indian currency
+    document.getElementById('oldTax').textContent = '₹' + formatIndianCurrency(oldTaxValue);
+    document.getElementById('newTax').textContent = '₹' + formatIndianCurrency(newTaxValue);
+
+    // Calculate Old regime rate of interest
+    let old_regime_interestRate = 0;
+    if (netIncomeValue <= 250000) {
+        old_regime_interestRate = 0;
+    } else if (netIncomeValue <= 300000) {
+        old_regime_interestRate = 0.05;
+    } else if (netIncomeValue <= 500000) {
+        old_regime_interestRate = 0.05;
+    } else if (netIncomeValue <= 1000000) {
+        old_regime_interestRate = 0.20;
+    } else {
+        old_regime_interestRate = 0.30;
+    }
+    document.getElementById('oldregimeinterestRate').textContent = (old_regime_interestRate * 100) + '%';
+
+    // Calculate New regime rate of interest
+    let new_regime_interestRate = 0;
+    if (netIncomeValue <= 300000) {
+        new_regime_interestRate = 0;
+    } else if (netIncomeValue <= 600000) {
+        new_regime_interestRate = 0.05;
+    } else if (netIncomeValue <= 900000) {
+        new_regime_interestRate = 0.10;
+    } else if (netIncomeValue <= 1200000) {
+        new_regime_interestRate = 0.15;
+    } else if (netIncomeValue <= 1500000) {
+        new_regime_interestRate = 0.20;
+    } else {
+        new_regime_interestRate = 0.30;
+    }
+    document.getElementById('newregimeinterestRate').textContent = (new_regime_interestRate * 100) + '%';
+
+    // Display deduction amount and gross income, formatted as Indian currency
+    document.getElementById('deductionAmount').textContent = '₹' + formatIndianCurrency(deduction);
+    document.getElementById('grossincome').textContent = '₹' + formatIndianCurrency(income);
+});
+</script>    
+</body>
+</html>
